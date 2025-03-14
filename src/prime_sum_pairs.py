@@ -32,13 +32,13 @@ def unique_prime_sum_pairs(n):
     if n < 1:
         raise ValueError("Input must be a positive integer.")
     
-    # Collect all possible pair sums
+    # Collect all possible pair sums starting from 2
     pair_sums = set()
     for i in range(1, n + 1):
         for j in range(i, n + 1):
-            pair_sums.add(i + j)
+            pair_sum = i + j
+            if is_prime(pair_sum) and pair_sum > 2:
+                pair_sums.add(pair_sum)
     
-    # Filter and collect unique prime sums
-    prime_sums = sorted(set(sum_val for sum_val in pair_sums if is_prime(sum_val)))
-    
-    return prime_sums
+    # Return sorted unique prime sums
+    return sorted(pair_sums)
