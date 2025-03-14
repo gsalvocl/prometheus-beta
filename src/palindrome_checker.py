@@ -1,3 +1,5 @@
+import unicodedata
+
 def is_palindrome(s: str) -> bool:
     """
     Determine if the given string is a palindrome.
@@ -19,8 +21,11 @@ def is_palindrome(s: str) -> bool:
         >>> is_palindrome("Was it a car or a cat I saw?")
         True
     """
-    # Remove non-alphanumeric characters and convert to lowercase
-    cleaned_str = ''.join(char.lower() for char in s if char.isalnum())
+    # Normalize Unicode characters and remove accents
+    normalized_str = ''.join(
+        char.lower() for char in unicodedata.normalize('NFKD', s)
+        if unicodedata.category(char)[0] not in ['P', 'Z', 'C']  # Exclude punctuation, separators, control chars
+    )
     
-    # Check if the cleaned string is equal to its reverse
-    return cleaned_str == cleaned_str[::-1]
+    # Check if the normalized string is equal to its reverse
+    return normalized_str == normalized_str[::-1]
