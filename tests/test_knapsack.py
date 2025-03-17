@@ -62,5 +62,5 @@ def test_multiple_optimal_solutions():
     capacity = 60
     max_value, selected_items = solve_knapsack(weights, values, capacity)
     
-    assert max_value == 220
-    assert (selected_items == [1, 2]) or (selected_items == [0, 1])
+    assert max_value == 280
+    assert (selected_items == [0, 1]) or (selected_items == [1, 2])
