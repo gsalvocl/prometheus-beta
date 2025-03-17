@@ -19,7 +19,7 @@ def send_email(to_email, subject, body, from_email=None):
 
     Raises:
         ValueError: If required email configuration is missing
-        SMTPException: For any SMTP-related errors during email sending
+        smtplib.SMTPException: For any SMTP-related errors during email sending
 
     Returns:
         bool: True if email sent successfully
@@ -56,4 +56,4 @@ def send_email(to_email, subject, body, from_email=None):
         return True
 
     except smtplib.SMTPException as e:
-        raise SMTPException(f"Failed to send email: {str(e)}")
+        raise smtplib.SMTPException(f"Failed to send email: {str(e)}")
