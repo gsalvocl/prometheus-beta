@@ -2,6 +2,15 @@ import pytest
 import logging
 from src.input_validation_logger import validate_input
 
+class ListHandler(logging.Handler):
+    """A logging handler that stores log records in a list."""
+    def __init__(self):
+        super().__init__()
+        self.records = []
+    
+    def emit(self, record):
+        self.records.append(record)
+
 def test_validate_input_basic():
     # Configure logging
     logger = logging.getLogger('test_func')
@@ -12,7 +21,7 @@ def test_validate_input_basic():
         return x + y
     
     # Capture log messages
-    handler = logging.StreamHandler()
+    handler = ListHandler()
     handler.setLevel(logging.DEBUG)
     logger.addHandler(handler)
     
@@ -21,7 +30,7 @@ def test_validate_input_basic():
         assert result == 8
         
         # Check log contents
-        log_records = [record.getMessage() for record in logger.handlers[0].records]
+        log_records = [record.getMessage() for record in handler.records]
         assert any("Input arguments: args=(5, 3), kwargs={}" in record for record in log_records)
         assert any("Input validation successful" in record for record in log_records)
     finally:
@@ -37,7 +46,7 @@ def test_validate_input_no_args():
         return True
     
     # Capture log messages
-    handler = logging.StreamHandler()
+    handler = ListHandler()
     handler.setLevel(logging.DEBUG)
     logger.addHandler(handler)
     
@@ -46,7 +55,7 @@ def test_validate_input_no_args():
         assert result is True
         
         # Check log contents
-        log_records = [record.getMessage() for record in logger.handlers[0].records]
+        log_records = [record.getMessage() for record in handler.records]
         assert any("No arguments provided" in record for record in log_records)
     finally:
         logger.removeHandler(handler)
@@ -61,7 +70,7 @@ def test_validate_input_type_error():
         return x
     
     # Capture log messages
-    handler = logging.StreamHandler()
+    handler = ListHandler()
     handler.setLevel(logging.DEBUG)
     logger.addHandler(handler)
     
@@ -70,7 +79,7 @@ def test_validate_input_type_error():
             test_func("not an int")
         
         # Check log contents
-        log_records = [record.getMessage() for record in logger.handlers[0].records]
+        log_records = [record.getMessage() for record in handler.records]
         assert any("Input arguments: args=('not an int',), kwargs={}" in record for record in log_records)
         assert any("Type error in input validation" in record for record in log_records)
     finally:
@@ -88,7 +97,7 @@ def test_validate_input_value_error():
         return x
     
     # Capture log messages
-    handler = logging.StreamHandler()
+    handler = ListHandler()
     handler.setLevel(logging.DEBUG)
     logger.addHandler(handler)
     
@@ -97,7 +106,7 @@ def test_validate_input_value_error():
             test_func(-5)
         
         # Check log contents
-        log_records = [record.getMessage() for record in logger.handlers[0].records]
+        log_records = [record.getMessage() for record in handler.records]
         assert any("Input arguments: args=(-5,), kwargs={}" in record for record in log_records)
         assert any("Value error in input validation" in record for record in log_records)
     finally:
@@ -113,7 +122,7 @@ def test_validate_input_custom_log_level():
         return x
     
     # Capture log messages
-    handler = logging.StreamHandler()
+    handler = ListHandler()
     handler.setLevel(logging.INFO)
     logger.addHandler(handler)
     
@@ -122,7 +131,7 @@ def test_validate_input_custom_log_level():
         assert result == 10
         
         # Check log contents
-        log_records = [record.getMessage() for record in logger.handlers[0].records]
+        log_records = [record.getMessage() for record in handler.records]
         assert any("Input arguments: args=(10,), kwargs={}" in record for record in log_records)
         assert any("Input validation successful" in record for record in log_records)
     finally:
