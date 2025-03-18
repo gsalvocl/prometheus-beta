@@ -22,11 +22,7 @@ def find_longest_substring(s: str) -> str:
         >>> find_longest_substring("")
         ''
     """
-    # Handle edge cases
-    if s is None:
-        return ""
-    
-    # Validate input type
+    # Strict type checking
     if not isinstance(s, str):
         raise TypeError("Input must be a string")
     
@@ -36,20 +32,16 @@ def find_longest_substring(s: str) -> str:
     
     # Sliding window approach to find longest unique substring
     longest_substring = ""
-    start = 0
     
-    for end in range(len(s)):
-        # Check substring from start to current end
-        current_substring = s[start:end+1]
-        
-        # If current substring has all unique characters
-        if len(set(current_substring)) == len(current_substring):
-            # Update longest substring if current is longer
-            if len(current_substring) > len(longest_substring):
-                longest_substring = current_substring
-        else:
-            # Move start pointer to remove duplicate
-            while len(set(s[start:end+1])) < end - start + 1:
-                start += 1
+    for i in range(len(s)):
+        for j in range(i, len(s)):
+            # Check substring from i to j
+            current_substring = s[i:j+1]
+            
+            # If current substring has all unique characters
+            if len(set(current_substring)) == len(current_substring):
+                # Update longest substring if current is longer
+                if len(current_substring) > len(longest_substring):
+                    longest_substring = current_substring
     
     return longest_substring
