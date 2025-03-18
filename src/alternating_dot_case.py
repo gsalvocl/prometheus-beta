@@ -21,6 +21,8 @@ def convert_to_alternating_dot_case(input_string):
         'p.Y.t.H.o.N'
         >>> convert_to_alternating_dot_case("")
         ''
+        >>> convert_to_alternating_dot_case("hello world")
+        'h.E.l.L.o. .W.o.R.l.D'
     """
     # Check if input is a string
     if not isinstance(input_string, str):
@@ -32,10 +34,11 @@ def convert_to_alternating_dot_case(input_string):
     
     # Create alternating dot case
     result = []
+    start_index = 0
+    
     for i, char in enumerate(input_string):
-        # Even indices (0, 2, 4...) are lowercase
-        # Odd indices (1, 3, 5...) are uppercase
-        if i % 2 == 0:
+        # Determine if this character should be lowercase or uppercase
+        if (start_index % 2 == 0):
             result.append(char.lower())
         else:
             result.append(char.upper())
@@ -43,5 +46,9 @@ def convert_to_alternating_dot_case(input_string):
         # Add dot between characters, but not after the last character
         if i < len(input_string) - 1:
             result.append('.')
+        
+        # Only increment start_index for non-space characters
+        if char != ' ':
+            start_index += 1
     
     return ''.join(result)
