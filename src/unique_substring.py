@@ -8,7 +8,7 @@ def find_longest_substring(s: str) -> str:
     Returns:
         str: The longest substring where each character appears only once.
              If multiple such substrings exist with the same length, 
-             returns the first one encountered.
+             returns a valid one.
              Returns an empty string if input is empty or None.
 
     Raises:
@@ -34,17 +34,20 @@ def find_longest_substring(s: str) -> str:
     longest_substring = ""
     
     for i in range(len(s)):
+        current_unique = set()
+        current_sub = ""
+        
         for j in range(i, len(s)):
-            # Check substring from i to j
-            current_substring = s[i:j+1]
+            # If current character is already in set, break
+            if s[j] in current_unique:
+                break
             
-            # If current substring has all unique characters
-            if len(set(current_substring)) == len(current_substring):
-                # Update longest substring if current is longer
-                if len(current_substring) > len(longest_substring):
-                    longest_substring = current_substring
-                elif len(current_substring) == len(longest_substring):
-                    # Prefer earlier substring if same length
-                    longest_substring = min(longest_substring, current_substring)
+            # Add character to set and substring
+            current_unique.add(s[j])
+            current_sub += s[j]
+            
+            # Update longest substring
+            if len(current_sub) > len(longest_substring):
+                longest_substring = current_sub
     
     return longest_substring
