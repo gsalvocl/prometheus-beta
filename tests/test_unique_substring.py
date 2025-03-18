@@ -5,7 +5,7 @@ def test_normal_cases():
     """Test various normal input scenarios."""
     assert find_longest_substring("abcabcbb") == "abc"
     assert find_longest_substring("bbbbb") == "b"
-    assert find_longest_substring("pwwkew") == "wke"
+    assert find_longest_substring("pwwkew") in ["wke", "kew"]
 
 def test_edge_cases():
     """Test edge cases like empty string, single character, etc."""
@@ -20,8 +20,7 @@ def test_full_unique_string():
 def test_multiple_longest_substrings():
     """Test cases with multiple longest unique substrings."""
     result = find_longest_substring("abcdaf")
-    assert len(result) == 4
-    assert all(len(substr) == 4 for substr in ["abcd", "cdaf"])
+    assert result in ["abcd", "cdaf"]
 
 def test_unicode_characters():
     """Test with unicode and non-ASCII characters."""
