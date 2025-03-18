@@ -32,20 +32,19 @@ def find_longest_substring(s: str) -> str:
     
     # Sliding window approach to find longest unique substring
     longest_substring = ""
-    start = 0
     
-    for end in range(len(s)):
-        # Create substring from start to current end
-        current_substring = s[start:end+1]
-        
-        # If current substring has all unique characters
-        if len(set(current_substring)) == len(current_substring):
-            # Update longest substring if current is longer
-            if len(current_substring) > len(longest_substring):
-                longest_substring = current_substring
-        else:
-            # Advance start pointer to maintain unique characters
-            while len(set(s[start:end+1])) < end - start + 1:
-                start += 1
+    for i in range(len(s)):
+        for j in range(i, len(s)):
+            # Check substring from i to j
+            current_substring = s[i:j+1]
+            
+            # If current substring has all unique characters
+            if len(set(current_substring)) == len(current_substring):
+                # Update longest substring if current is longer
+                if len(current_substring) > len(longest_substring):
+                    longest_substring = current_substring
+                elif len(current_substring) == len(longest_substring):
+                    # Prefer earlier substring if same length
+                    longest_substring = min(longest_substring, current_substring)
     
     return longest_substring
