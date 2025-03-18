@@ -10,13 +10,13 @@ def capture_logs(log_level=logging.WARNING):
     handler = logging.StreamHandler(log_capture)
     handler.setLevel(log_level)
     
-    # Get the root logger and configure it
-    logger = logging.getLogger()
+    # Configure a logger specific to the test
+    logger = logging.getLogger('test_logger')
     logger.setLevel(log_level)
     
     # Remove existing handlers to avoid duplicate logging
-    for existing_handler in logger.handlers[:]:
-        logger.removeHandler(existing_handler)
+    while logger.handlers:
+        logger.removeHandler(logger.handlers[0])
     
     logger.addHandler(handler)
     
@@ -26,15 +26,21 @@ def remove_log_handler(handler, logger):
     logger.removeHandler(handler)
 
 def test_validate_input_basic():
+    # Create a logger for the specific test function
+    test_logger = logging.getLogger('test_func')
+    test_logger.setLevel(logging.WARNING)
+    
     @validate_input()
     def test_func(x: int, y: int):
         return x + y
     
-    # Reset logging to capture logs consistently
-    logging.getLogger().handlers.clear()
     log_capture, handler, logger = capture_logs()
     
     try:
+        # Temporarily replace the function's logger with our test logger
+        original_logger = logging.getLogger('test_func')
+        logging.Logger.manager.loggerDict['test_func'] = logger
+        
         result = test_func(5, 3)
         assert result == 8
         
@@ -46,6 +52,8 @@ def test_validate_input_basic():
         assert "Input arguments: args=(5, 3), kwargs={}" in log_output
         assert "Input validation successful" in log_output
     finally:
+        # Restore the original logger
+        logging.Logger.manager.loggerDict['test_func'] = original_logger
         remove_log_handler(handler, logger)
 
 def test_validate_input_no_args():
@@ -53,8 +61,6 @@ def test_validate_input_no_args():
     def test_func():
         return True
     
-    # Reset logging to capture logs consistently
-    logging.getLogger().handlers.clear()
     log_capture, handler, logger = capture_logs()
     
     try:
@@ -75,8 +81,6 @@ def test_validate_input_type_error():
     def test_func(x: int):
         return x
     
-    # Reset logging to capture logs consistently
-    logging.getLogger().handlers.clear()
     log_capture, handler, logger = capture_logs()
     
     try:
@@ -99,8 +103,6 @@ def test_validate_input_value_error():
             raise ValueError("Negative values not allowed")
         return x
     
-    # Reset logging to capture logs consistently
-    logging.getLogger().handlers.clear()
     log_capture, handler, logger = capture_logs()
     
     try:
@@ -121,8 +123,6 @@ def test_validate_input_custom_log_level():
     def test_func(x: int):
         return x
     
-    # Reset logging to capture logs consistently
-    logging.getLogger().handlers.clear()
     log_capture, handler, logger = capture_logs(logging.INFO)
     
     try:
