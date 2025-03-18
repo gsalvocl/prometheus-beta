@@ -1,5 +1,6 @@
 import logging
 import functools
+import inspect
 
 def validate_input(log_level=logging.WARNING):
     """
@@ -36,6 +37,18 @@ def validate_input(log_level=logging.WARNING):
                 # Validate number of arguments
                 if not args and not kwargs:
                     logger.warning("No arguments provided")
+                
+                # Validate argument types
+                signature = inspect.signature(func)
+                bound_arguments = signature.bind(*args, **kwargs)
+                bound_arguments.apply_defaults()
+                
+                for param_name, param_value in bound_arguments.arguments.items():
+                    param = signature.parameters[param_name]
+                    if param.annotation != inspect.Parameter.empty:
+                        # Check type annotation
+                        if not isinstance(param_value, param.annotation):
+                            raise TypeError(f"Argument {param_name} must be of type {param.annotation.__name__}")
                 
                 # Perform function call
                 result = func(*args, **kwargs)
