@@ -22,22 +22,24 @@ def validate_input(log_level=logging.WARNING):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            # Create a logger specifically for this function
+            # Ensure logging is configured
+            logging.basicConfig(
+                level=logging.DEBUG, 
+                format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            )
+            
+            # Create a logger for this function
             logger = logging.getLogger(func.__name__)
             logger.setLevel(log_level)
-            
-            # If no handlers exist, create a console handler
-            if not logger.handlers:
-                console_handler = logging.StreamHandler()
-                console_handler.setLevel(log_level)
-                formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-                console_handler.setFormatter(formatter)
-                logger.addHandler(console_handler)
             
             # Validate arguments
             try:
                 # Log input arguments
-                logger.log(log_level, f"Input arguments: args={args}, kwargs={kwargs}")
+                log_message = f"Input arguments: args={args}, kwargs={kwargs}"
+                if log_level == logging.WARNING:
+                    logger.warning(log_message)
+                elif log_level <= logging.INFO:
+                    logger.info(log_message)
                 
                 # Validate number of arguments
                 if not args and not kwargs:
@@ -58,8 +60,10 @@ def validate_input(log_level=logging.WARNING):
                 # Perform function call
                 result = func(*args, **kwargs)
                 
-                # Log successful validation - use the log method to respect log_level
-                logger.log(logging.INFO, "Input validation successful")
+                # Log successful validation
+                success_message = "Input validation successful"
+                if log_level <= logging.INFO:
+                    logger.info(success_message)
                 
                 return result
             
