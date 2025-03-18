@@ -28,11 +28,7 @@ def find_smallest_list_sum(list1, list2):
     except (ValueError, TypeError):
         raise TypeError("All list elements must be integers or convertible to integers")
     
-    # Find the smallest possible sum
-    smallest_sum = float('inf')
-    for num1 in list1:
-        for num2 in list2:
-            current_sum = num1 + num2
-            smallest_sum = min(smallest_sum, current_sum)
+    # Find the smallest possible sum by taking the minimum element from each list
+    smallest_sum = min(list1) + min(list2)
     
     return smallest_sum
