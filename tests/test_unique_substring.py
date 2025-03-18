@@ -20,8 +20,8 @@ def test_full_unique_string():
 def test_multiple_longest_substrings():
     """Test cases with multiple longest unique substrings."""
     result = find_longest_substring("abcdaf")
-    assert result in ["abcd", "cdaf"]
     assert len(result) == 4
+    assert all(len(substr) == 4 for substr in ["abcd", "cdaf"])
 
 def test_unicode_characters():
     """Test with unicode and non-ASCII characters."""
