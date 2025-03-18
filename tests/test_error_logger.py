@@ -36,4 +36,4 @@ def test_log_error_with_empty_string():
     sys.stdout = sys.__stdout__
 
     # Check the output
-    assert captured_output.getvalue().strip() == "ERROR: "
+    assert captured_output.getvalue() == "ERROR: \n"
