@@ -23,7 +23,7 @@ def test_single_element_array():
 
 def test_large_elements():
     """Test with large elements"""
-    assert count_subarrays_with_product_less_than_k([1, 100, 10, 5], 50) == 5
+    assert count_subarrays_with_product_less_than_k([1, 100, 10, 5], 50) == 3
 
 def test_all_elements_greater_than_k():
     """Test when all elements are greater than k"""
@@ -32,4 +32,4 @@ def test_all_elements_greater_than_k():
 def test_mixed_elements():
     """Test array with mixed elements"""
     test_array = [1, 2, 3, 4]
-    assert count_subarrays_with_product_less_than_k(test_array, 10) == 8
+    assert count_subarrays_with_product_less_than_k(test_array, 10) == 7
