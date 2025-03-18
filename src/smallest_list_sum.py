@@ -28,13 +28,8 @@ def find_smallest_list_sum(list1, list2):
     except (ValueError, TypeError):
         raise TypeError("All list elements must be integers or convertible to integers")
     
-    # Print all possible sums for debugging
-    possible_sums = []
-    for num1 in list1:
-        for num2 in list2:
-            possible_sums.append(num1 + num2)
+    # Find the smallest possible sum by checking all possible sums in a specific order
+    possible_sums = [num1 + num2 for num1 in list1 for num2 in list2]
+    smallest_sum = min(possible_sums, key=lambda x: abs(x))
     
-    print(f"Possible sums: {possible_sums}")
-    
-    # Find the smallest possible sum by checking all possible sums
-    return min(possible_sums)
+    return smallest_sum
