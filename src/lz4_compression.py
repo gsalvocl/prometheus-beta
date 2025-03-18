@@ -44,14 +44,14 @@ def lz4_compress(data):
         best_length = 0
         best_offset = 0
         
-        # Search back up to 65535 bytes
+        # Search back up to 65535 bytes (max window size)
         for j in range(max(0, i - 65535), i):
             # Find longest matching sequence
             match_length = 0
             while (i + match_length < len(data) and 
                    j + match_length < i and 
                    data[j + match_length] == data[i + match_length] and 
-                   match_length < 255):
+                   match_length < 255 + 15):  # Adjust max match length
                 match_length += 1
             
             # Update best match if found
@@ -61,10 +61,18 @@ def lz4_compress(data):
         
         # Encode based on the match
         if best_length >= 4:
-            # Encode match
-            compressed.append(best_length)
+            # Encode a match
+            # First byte encodes match length and initial literal
+            if best_length > 15:
+                # Handle long match lengths
+                compressed.append(15 + (best_length - 15))
+            else:
+                compressed.append(best_length)
+            
+            # Next two bytes encode offset
             compressed.append(best_offset & 0xFF)  # Low byte
             compressed.append((best_offset >> 8) & 0xFF)  # High byte
+            
             i += best_length
         else:
             # Encode literal byte
@@ -102,33 +110,55 @@ def lz4_decompress(compressed_data):
         # Current processing byte
         current_byte = compressed_data[i]
         
-        # If byte is less than 15, it's a single literal byte
+        # Check if it's a literal or a match
         if current_byte < 15:
-            decompressed.append(current_byte)
-            i += 1
+            # Literal byte or short match
+            length = current_byte
+            
+            # Process literal bytes
+            for j in range(length):
+                if i + 1 + j >= len(compressed_data):
+                    raise ValueError("Incomplete compressed data")
+                decompressed.append(compressed_data[i + 1 + j])
+            
+            # If this was a match
+            if length == 15 and i + 1 < len(compressed_data):
+                # Add extra length bytes for matches > 15
+                while compressed_data[i + 1] == 255:
+                    length += 255
+                    i += 1
+                    if i + 1 >= len(compressed_data):
+                        break
+                
+                # Add final extra length byte
+                if i + 1 < len(compressed_data):
+                    length += compressed_data[i + 1]
+            
+            # Advance index
+            i += length + 1
         else:
             # It's a match sequence
             # Ensure we have enough bytes to process the match
             if i + 2 >= len(compressed_data):
                 raise ValueError("Invalid compressed data")
             
-            # Decode match length and offset
-            length = current_byte
+            # Match length is in the high 4 bits
+            match_length = current_byte - 15
+            
+            # Offset is in the next two bytes (little-endian)
             offset = (compressed_data[i+2] << 8) | compressed_data[i+1]
             
-            # Validate offset and length
-            if offset == 0 or length == 0:
-                raise ValueError("Invalid offset or length in compressed data")
+            # Validate offset
+            if offset == 0:
+                raise ValueError("Invalid offset in compressed data")
             
-            # Find the start position to copy from
+            # Compute copy starting location
             start = len(decompressed) - offset
             
             # Safely copy matched sequence
-            for _ in range(length):
-                if start < 0 or start >= len(decompressed):
-                    break  # or raise ValueError("Invalid match sequence")
-                
-                # Copy a previously decompressed byte
+            for _ in range(match_length):
+                if start < 0:
+                    raise ValueError("Invalid match sequence")
                 decompressed.append(decompressed[start])
                 start += 1
             
