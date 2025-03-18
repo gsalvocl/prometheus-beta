@@ -22,12 +22,17 @@ def validate_input(log_level=logging.WARNING):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            # Configure logging if not already configured
-            logging.basicConfig(
-                level=logging.DEBUG, 
-                format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-            )
+            # Use the name of the calling function for the log name
             logger = logging.getLogger(func.__name__)
+            
+            # Ensure logging is configured
+            if not logger.handlers:
+                console_handler = logging.StreamHandler()
+                console_handler.setLevel(log_level)
+                formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                console_handler.setFormatter(formatter)
+                logger.addHandler(console_handler)
+                logger.setLevel(log_level)
             
             # Validate arguments
             try:
