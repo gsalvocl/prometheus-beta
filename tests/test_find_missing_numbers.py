@@ -38,5 +38,5 @@ def test_invalid_input_non_integer():
 
 def test_descending_order():
     """Test that the function requires a sorted (ascending) input."""
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError, match="Input array must be sorted in ascending order"):
         find_missing_numbers([10, 5, 1])
